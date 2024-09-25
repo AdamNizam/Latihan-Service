@@ -13,10 +13,28 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.myservice.databinding.ActivityMainBinding
 import android.Manifest
+import android.content.ComponentName
+import android.content.ServiceConnection
+import android.os.IBinder
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding:ActivityMainBinding
+    private var boundStatus = false
+    private lateinit var boundService: MyBoundService
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceDisconnected(name: ComponentName) {
+            boundStatus = false
+        }
+
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            val myBinder = service as MyBoundService.MyBinder
+            boundService = myBinder.getService
+            boundStatus = true
+            getNumberFromService()
+        }
+    }
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -79,5 +97,29 @@ class MainActivity : AppCompatActivity() {
             stopService(foregroundServiceIntent)
         }
 
+        // Bound Service
+        val boundServiceIntent = Intent(this, MyBoundService::class.java)
+        binding.btnStartBoundService.setOnClickListener {
+            bindService(boundServiceIntent, connection, BIND_AUTO_CREATE)
+        }
+        binding.btnStopBoundService.setOnClickListener {
+            unbindService(connection)
+        }
+
+    }
+
+
+    private fun getNumberFromService() {
+        boundService.numberLiveData.observe(this) { number ->
+            binding.tvBoundServiceNumber.text = number.toString()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (boundStatus) {
+            unbindService(connection)
+            boundStatus = false
+        }
     }
 }

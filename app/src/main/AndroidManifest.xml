@@ -2,12 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-
-    <!-- OS Android 12 (API 31-->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <!--Android API 34. OS Android 14-->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- OS Android 12 (API 31 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- Android API 34. OS Android 14 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <application
         android:allowBackup="true"
@@ -20,17 +17,20 @@
         android:theme="@style/Theme.MyService"
         tools:targetApi="31">
         <service
+            android:name=".MyBoundService"
+            android:enabled="true"/>
+        <service
             android:name=".MyForegroundService"
             android:enabled="true"
             android:foregroundServiceType="specialUse">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="explanation_for_special_use"/>
+                android:value="explanation_for_special_use" />
         </service>
         <service
             android:name=".MyBackgroundService"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false" />
 
         <activity
             android:name=".MainActivity"
